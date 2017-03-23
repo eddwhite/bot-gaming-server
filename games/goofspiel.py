@@ -9,55 +9,52 @@ import random
 class Goofspiel:
     def __init__(self, player_cb):
         self.player_cb = player_cb
+        # Ace (low): 1, J: 11, Q: 12, K: 13
+        # track cards played by each player
+        self.hands = [list(range(1, 14)) for player in range(2)]
+        self.results = []
+        self.prizes = list(range(1, 14))
+        # randomise order of prize cards
+        random.shuffle(self.prizes)
 
-    def play():
 
-
-def play(player_cb):
-    # randomise ordrer of "prizes"
-    prizes = [i for i in range(1,14)]
-    random.shuffle(prizes)
-    # track cards played and the score
-    p1_hand, p2_hand = [[i for i in range(1,14)] for j in range(2)]
-    results = []
-    # reveal prizes to players and compare their bids
-    for p in prizes:
-        m1 = player_cb(1, [p])[0] # get player 1 move
-
-        if p1_hand.count(m1) == 1:
-            p1_hand.remove(m1)
+    def players_move(self, player, prize):
+        c = self.player_cb(0, prize)
+        if self.hands[player].count(c) == 1:
+            self.hands[player].remove(c)
         else:
-            print("Cheat!")
+            print("Player {0} is a cheat!".format(player))
 
-        m2 = player_cb(2, [p])[0] # get player 2 move
+        return c
 
-        if p2_hand.count(m2) == 1:
-            p2_hand.remove(m2)
+
+    def play(self):
+        for p in self.prizes:
+            # get players moves
+            m0 = self.players_move(0, p)
+            m1 = self.players_move(1, p)
+
+            # sign of score indicates winner
+            # player 0: negative, player 1: positive
+            if m0 > m1:
+                winner = -p
+            elif m1 > m0:
+                winner = p
+            else:
+                # draw
+                winner = 0
+
+            self.results.append(winner)
+
+        # sum all results of that players sign to get scores
+        p0_score = abs(sum(filter(lambda x: x < 0, results)))
+        p1_score = abs(sum(filter(lambda x: x > 0, results)))
+
+        # figure out winner
+        if p0_score > p1_score:
+            print("Player 0 wins")
+        elif p1_score > p0_score:
+            print("Player 1 wins")
         else:
-            print("Cheat!")
-
-        # sign of score indicates winner
-        # player 1: negative, player 2: positive
-        if m1 > m2:
-            winner = -p
-        elif m1 < m2:
-            winner = p
-        else:
-            winner = 0
-
-        results.append(winner)
-
-    # sum all results of that players sign to get scores
-    scores.append(abs(sum(filter(lambda x: x<0, results))))
-    scores.append(abs(sum(filter(lambda x: x>0, results))))
-
-    # figure out winner
-    if scores[0] > scores[1]:
-        # player 1 is winner
-        print("Player 1 wins")
-    elif scores[0] < scores[1]:
-        # player 2 is winner
-        print("Player 2 wins")
-    else:
-        # draw
-        print("It's a draw")
+            # draw
+            print("It's a draw")
