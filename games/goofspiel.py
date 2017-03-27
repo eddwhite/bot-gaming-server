@@ -12,14 +12,29 @@ class Goofspiel:
         # Ace (low): 1, J: 11, Q: 12, K: 13
         # track cards played by each player
         self.hands = [list(range(1, 14)) for player in range(2)]
-        self.results = []
+        self.played = []
         self.prizes = list(range(1, 14))
         # randomise order of prize cards
         random.shuffle(self.prizes)
 
 
+    def reset(self):
+        # Ace (low): 1, J: 11, Q: 12, K: 13
+        # track cards played by each player
+        self.hands = [list(range(1, 14)) for player in range(2)]
+        self.played = []
+        # randomise order of prize cards
+        random.shuffle(self.prizes)
+
+
     def players_move(self, player, prize):
-        c = self.player_cb(0, prize)
+        # send, if available, previous card played by opponent
+        info = [prize]
+        if self.played != []:
+            info.append(self.played[-1][1-player])
+
+        c = self.player_cb(player, info)
+
         if self.hands[player].count(c) == 1:
             self.hands[player].remove(c)
         else:
@@ -28,33 +43,34 @@ class Goofspiel:
         return c
 
 
-    def play(self):
-        for p in self.prizes:
-            # get players moves
-            m0 = self.players_move(0, p)
-            m1 = self.players_move(1, p)
-
-            # sign of score indicates winner
-            # player 0: negative, player 1: positive
-            if m0 > m1:
-                winner = -p
-            elif m1 > m0:
-                winner = p
-            else:
-                # draw
-                winner = 0
-
-            self.results.append(winner)
-
+    def winner(self):
         # sum all results of that players sign to get scores
-        p0_score = abs(sum(filter(lambda x: x < 0, results)))
-        p1_score = abs(sum(filter(lambda x: x > 0, results)))
+        scores = [0, 0]
+        for bid in self.played:
+            turn = self.played.index(bid)
+            # check it wasn't a draw
+            if bid.count(max(bid)) == 1:
+                scores[bid.index(max(bid))] += self.prizes[turn]
+        
+        print("Player 1: {0}\tPlayer 2: {1}".format(score[0], score[1]))
 
         # figure out winner
-        if p0_score > p1_score:
-            print("Player 0 wins")
-        elif p1_score > p0_score:
-            print("Player 1 wins")
+        if scores.count(max(scores)) == 1:
+            print("Player {0} wins".format(scores.index(max(scores))))
         else:
             # draw
             print("It's a draw")
+            
+
+    def play(self):
+        # reveal prize one by one
+        for p in self.prizes:
+            # get players moves
+            bids = []
+            for player in range(2):
+                bids.append(self.players_move(player, p))
+
+            self.played.append(bids)
+
+        self.winner()
+        
