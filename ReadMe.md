@@ -24,7 +24,11 @@ Would a game Class be better? probably!
 
 ## Security
 Bots are run in their own container, with minimal priveleges. There is also a resource limit placed on the container, both in terms of memory and time. <?>
-The game host communicates with the bots through the UNIX socket. <?>
+The game host communicates with the bots through the UNIX socket. A shared folder is created with the command:
+```bash
+lxc config device add epic-grouse sharedtmp disk path=/home/ubuntu source=/home/edd/Workspace/shared
+```
+A socket file is created in this shared space, with permissions such that anyone can r/w to it
 Any persistent files that are needed by the bots (e.g. debug logs, trained models) should be stored <?>. The maximum file size is <?>
 
 

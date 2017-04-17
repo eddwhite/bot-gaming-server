@@ -3,8 +3,19 @@
 Handle communication with players
 '''
 
+import json
+
 from games.goofspiel import Goofspiel
 from games.hearts import Hearts
+
+
+def container_cb(player, info):
+    json.dumps(info)
+
+    try:
+        json.loads()
+    except json.JSONDecodeError:
+        print("Not valid JSON ... tut tut!")
 
 
 def player_cb(player, info):
